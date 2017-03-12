@@ -7,11 +7,12 @@ ageReader <- function(original.directory,
   # 0. Grundlagen ###
   
   options(stringsAsFactors = FALSE)
-  source("C:\\Users\\Kai\\Documents\\Projekte\\ageReader\\R files\\ageReader_makeGrey.R")
-  source("C:\\Users\\Kai\\Documents\\Projekte\\ageReader\\R files\\ageReader_findEdge.R")
-  source("C:\\Users\\Kai\\Documents\\Projekte\\ageReader\\R files\\ageReader_redPosition.R")
-  source("C:\\Users\\Kai\\Documents\\Projekte\\ageReader\\R files\\ageReader_editImage.R")
-  source("C:\\Users\\Kai\\Documents\\Projekte\\ageReader\\R files\\ageReader_smoothGreyImage.R")
+  #source("Rfiles\\ageReader_makeGrey.R")
+  #source("Rfiles\\ageReader_findEdge.R")
+  #source("Rfiles\\ageReader_redPosition.R")
+  #source("Rfiles\\ageReader_editImage.R")
+  #source("Rfiles\\ageReader_smoothGreyImage.R")
+  
   # 1. Importiere User-Datei und erweitere Sie um Spalten
   
   # Setzen des Inputordners
@@ -92,6 +93,7 @@ ageReader <- function(original.directory,
     # Schreibe graues Bild und editiertes Farbbild in neuen
     # Ordner
     
+    setwd(original.directory)
     dir.create(output.directory, showWarnings = FALSE)
     setwd(output.directory)
     
@@ -105,7 +107,7 @@ ageReader <- function(original.directory,
   
 
   setwd(.old.directory)
-  # Zurücksetzen des Pfades
+  # Zuruecksetzen des Pfades
   setwd(original.directory)
   
   

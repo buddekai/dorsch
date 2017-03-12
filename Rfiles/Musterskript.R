@@ -1,16 +1,14 @@
 # Musterskirpt zum Arbeiten mit dem ageReader-Paket
 
 
-# 1. Definition der Pfade für die Bilder und für die User-Datei ####
+# 1. Definition der Pfade fuer die Bilder und fuer die User-Datei ####
 
 original.directory <- getwd()
 
-# Der gewählte Ordner soll sowohl die Userdatei als auch den Unterordner mit
+# Der gewaehlte Ordner soll sowohl die Userdatei als auch den Unterordner mit
 # den Fotos enthalten.
-input.directory <-
-  "C:\\Users\\Kai\\Documents\\Projekte\\ageReader\\input"
-output.directory <- 
-  "C:\\Users\\Kai\\Documents\\Projekte\\ageReader\\output"
+input.directory <- "input"
+output.directory <- "output"
 
 # Unterodner mit den Fotos (bitte tiffs).
 
@@ -21,9 +19,12 @@ image.subdirectory <- "otoliths_tiff"
 user.file <- "otoliths_userfile.csv"
 
 
-# 2. Ab hier arbeitet das Paket selbstständig. ####
+# 2. Bearbeitung der Bilder ####
 
-source("C:\\Users\\Kai\\Documents\\Projekte\\ageReader\\R files\\ageReader_Master.R")
+
+# 3. Finden des Alters usw. (Hauptaufgabe) ####
+
+source("Rfiles/ageReader_Master.R")
 
 ageReader(original.directory = original.directory,
           image.subdirectory = image.subdirectory,
