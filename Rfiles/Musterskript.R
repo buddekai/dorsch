@@ -5,8 +5,8 @@
 
 original.directory <- getwd()
 
-# Der gewaehlte Ordner soll sowohl die Userdatei als auch den Unterordner mit
-# den Fotos enthalten.
+# Der gewaehlte Ordner soll sowohl die Userdatei als auch den Unterordner
+# mit den Fotos enthalten.
 input.directory <- "input"
 output.directory <- "output"
 
