@@ -5,27 +5,23 @@
 getLineIndices <- function(start.x, start.y,
                            end.x, end.y){
   
-  # for test
-  #start.x <- 11
-  #start.y <- 11
-  
-  #end.x <- 1
-  #end.y <- 11
-
-  # until here
-  
-  # unterscheide folgende F?lle
+  # unterscheide folgende Faelle
   # 1. horizontale bzw. 2. vertikale Linien
   # 3. Anstieg zwischen 0 und 1
-  # 4. Anstieg gr?sser als 1
+  # 4. Anstieg groesser als 1
   # 5. Anstieg zwischen 0 und -1
   # 6. Anstieg kleiner als -1
   
+  reverse.it <- FALSE
+  
   # zu 1.
   if(end.y == start.y){
-    
+    points <- matrix(c(start.x:end.x))
+    points <- cbind(points, start.y)
     
   }else if(end.x == start.x){ # zu 2.
+    points <- matrix(c(start.y:end.y))
+    points <- cbind(points, start.x)
     
   }else{
     
@@ -43,6 +39,8 @@ getLineIndices <- function(start.x, start.y,
         
         end.x <- .dumx
         end.y <- .dumy
+        
+        reverse.it <- TRUE
       }
       
       A <- 2*(end.y-start.y)
@@ -62,7 +60,7 @@ getLineIndices <- function(start.x, start.y,
           P <- B + P
         }
       }
-      rownames(points) <- NULL
+      
     }
     
     # zu 4.
@@ -77,6 +75,8 @@ getLineIndices <- function(start.x, start.y,
         
         end.x <- .dumx
         end.y <- .dumy
+        
+        reverse.it <- TRUE
       }
       
       A <- 2*(end.x-start.x)
@@ -96,7 +96,7 @@ getLineIndices <- function(start.x, start.y,
           P <- B + P
         }
       }
-      rownames(points) <- NULL
+      
     }
     
     # zu 5.
@@ -112,6 +112,8 @@ getLineIndices <- function(start.x, start.y,
         
         end.x <- .dumx
         end.y <- .dumy
+        
+        reverse.it <- TRUE
       }
       
       A <- abs(2*(end.y-start.y))
@@ -131,7 +133,6 @@ getLineIndices <- function(start.x, start.y,
           P <- B + P
         }
       }
-      rownames(points) <- NULL
     }
     
     # zu 6.
@@ -146,6 +147,8 @@ getLineIndices <- function(start.x, start.y,
         
         end.x <- .dumx
         end.y <- .dumy
+        
+        reverse.it <- TRUE
       }
       
       A <- 2*abs(end.x-start.x)
@@ -165,10 +168,18 @@ getLineIndices <- function(start.x, start.y,
           P <- B + P
         }
       }
-      rownames(points) <- NULL
+
     }
     
   }
+  
+  if(reverse.it){
+    points <- apply(points, 2, rev)
+  }
+  
+  points <- unname(points)
+  
+  rm(reverse.it, A, B, current.point, P, slope)
   
   return(points)
 }
