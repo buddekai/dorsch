@@ -6,18 +6,18 @@ getLineIndices <- function(start.x, start.y,
                            end.x, end.y){
   
   # for test
-  start.x <- 11
-  start.y <- 11
+  #start.x <- 11
+  #start.y <- 11
   
-  end.x <- 1
-  end.y <- 11
+  #end.x <- 1
+  #end.y <- 11
 
   # until here
   
-  # unterscheide folgende Fälle
+  # unterscheide folgende F?lle
   # 1. horizontale bzw. 2. vertikale Linien
   # 3. Anstieg zwischen 0 und 1
-  # 4. Anstieg grösser als 1
+  # 4. Anstieg gr?sser als 1
   # 5. Anstieg zwischen 0 und -1
   # 6. Anstieg kleiner als -1
   

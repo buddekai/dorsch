@@ -1,4 +1,4 @@
-# Funktion um die Zeilen und Spalten im Bild zu glätten.
+# Funktion um die Zeilen und Spalten im Bild zu glaetten.
 # Als direction gilt entweder: "horizontal" oder "vertical"
 
 # Es wird ein Binomialfilter benutzt.

@@ -7,11 +7,13 @@ ageReader <- function(original.directory,
   # 0. Grundlagen ###
   
   options(stringsAsFactors = FALSE)
-  #source("Rfiles\\ageReader_makeGrey.R")
-  #source("Rfiles\\ageReader_findEdge.R")
-  #source("Rfiles\\ageReader_redPosition.R")
-  #source("Rfiles\\ageReader_editImage.R")
-  #source("Rfiles\\ageReader_smoothGreyImage.R")
+  source("Rfiles\\ageReader_makeGrey.R")
+  source("Rfiles\\ageReader_findEdge.R")
+  source("Rfiles\\ageReader_redPosition.R")
+  source("Rfiles\\ageReader_editImage.R")
+  source("Rfiles\\ageReader_smoothGreyImage.R")
+  source("Rfiles\\ageReader_findEdge2.R")
+  source("Rfiles\\ageReader_getLineIndices.R")
   
   # 1. Importiere User-Datei und erweitere Sie um Spalten
   
@@ -62,6 +64,9 @@ ageReader <- function(original.directory,
     # Als graues Bild abspeichern
     image.grey <- makeGrey(image)
     image.grey.copy <- image.grey
+    
+    # Speichere ein farbiges Bild mit Nullen ab, das nach und nach mit
+    # Werten für Markierungen gefüllt wird.
     
     
     # Test#
