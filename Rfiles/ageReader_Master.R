@@ -13,6 +13,7 @@ ageReader <- function(original.directory,
   source("Rfiles\\ageReader_editImage.R")
   source("Rfiles\\ageReader_smoothGreyImage.R")
   source("Rfiles\\ageReader_getLineIndices.R")
+  source("Rfiles\\ageReader_scanForEdge.R")
   
   # 1. Importiere User-Datei und erweitere Sie um Spalten
   
@@ -68,6 +69,12 @@ ageReader <- function(original.directory,
     # Werten für Markierungen gefüllt wird.
     
     image.information <- array(data = 0, dim = dim(image))
+    
+    # Finde den Rand von innen heraus.
+    image.information <- scanForEdge(image.grey = image.grey,
+                                     image.information = image.information,
+                                     distance = 50)
+    image.information.copy <- image.information
     
     # Schreibe graues Bild und editiertes Farbbild in neuen
     # Ordner
