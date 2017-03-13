@@ -1,69 +1,43 @@
-# Funktion zum Finden eines Helligkeitssprunges
-# entweder wird entlang der x- oder entlang der y-Achse gelaufen
-# Falls x-Koordinate gegeben -> laufe in y-Richtung
-# direction: up or down or left or right
+# Funktion um den Rand des Otolithen zu finden.
 
-findEdge <- function(image.grey, xcoord, ycoord, direction){
+findEdge <- function(image.information, image.grey,
+                      start.pixel, end.pixel){
   
-  missing(ycoord)
-  if(missing(ycoord)){
-    ycoord <- -1
+  # Endparameter
+  
+  parameter.for.end <- 1.5
+  
+  start.pixel = start
+  end.pixel = c(i,1)
+  
+  results <- getLineIndices(start.x = start.pixel[2],
+                            start.y = start.pixel[1],
+                            end.x = end.pixel[2],
+                            end.y = end.pixel[1])
+  
+  moving.average <- image.grey[start.pixel[2], start.pixel[1]]
+  
+  end <- dim(results)[1]
+  
+  i <- 1
+  current.point <- image.grey[results[i, 2], results[i, 1]]
+  test <- current.point > moving.average / parameter.for.end
+             
+  while(test){
+    i <- i+1
+    current.point <- image.grey[results[i, 2], results[i, 1]]
+    
+    moving.average <- (3*moving.average + current.point)/4
+    print(i)
+    print(current.point)
+    print(moving.average)
+    print(results[i, 2])
+    print(results[i, 1])
+    test <- current.point > moving.average / parameter.for.end
   }
-  if(missing(xcoord)){
-    xcoord <- -1
-  }
   
-  # Parameter ####
-  
-  
-  
-  # Schwarzwert soll das x-fache des Mittelwertes der ersten zehn Punkte
-  # sein
-  black.parameter <- 2.0
-  
-  # Funktion ####
-  
-  # Finde heraus, in welche Richtung gegangen werden soll.
-  if(ycoord != -1){
-    
-    print("Bkah")
-    
-  }else if(xcoord != -1){
-    
-    # Nimm die ersten 10 Werte, die kleiner sind als 0.1.
-    # Dann berechne den gleitenden Durchschnitt und sieh nach,
-    # wann die ersten drei Werte kommen, die grösser sind als dieser.
-    
-    # Folgende Zeilen nur zu Testzwecken
-    #print(image.grey[,xcoord])
-    #df.test.line <- data.frame("blackvalues"=image.grey[,xcoord])
-    #df.test.line$belowblacklimit <- df.test.line$blackvalues < black.limit
-    # Bis hier
+  result <- c(results[i, 1], results[i, 2])
+  return(result)
 
-    if(direction == "down"){
-      # Teste, ob der Anfang wirklich schwarz ist
-      if( sum(image.grey[1:10, xcoord] < 0.1 ) == 10 ){
-        moving.average <- mean(image.grey[1:10, xcoord])
-        # Nicht wirklich ein moving average -> Löschen?
-        
-        black.limit <- black.parameter*moving.average
-        test.limit <- mean(image.grey[, xcoord])
-        
-        # Finde den ersten Wert, der grösser ist als black.limit und nachdem
-        # keine dunkle Stelle mehr kommt (bis zur Mitte)
-        
-        #max.black <- which(image.grey[,xcoord] < black.limit)
-        max.black <- which(image.grey[,xcoord] < test.limit)
-        max.black <- max.black[max.black < dim(image.grey)[1] / 2]                   
-        max.black <- max(max.black)
-        
-        edge <- c(max.black+1, xcoord)
-        
-      }else{
-        print("it is not black enough")
-      }
-    }
-  }else{
-    print("Neither x- nor y-axis have been defined.")
-  }
+  
 }

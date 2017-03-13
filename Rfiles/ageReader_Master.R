@@ -12,7 +12,6 @@ ageReader <- function(original.directory,
   source("Rfiles\\ageReader_redPosition.R")
   source("Rfiles\\ageReader_editImage.R")
   source("Rfiles\\ageReader_smoothGreyImage.R")
-  source("Rfiles\\ageReader_findEdge2.R")
   source("Rfiles\\ageReader_getLineIndices.R")
   
   # 1. Importiere User-Datei und erweitere Sie um Spalten
@@ -68,32 +67,7 @@ ageReader <- function(original.directory,
     # Speichere ein farbiges Bild mit Nullen ab, das nach und nach mit
     # Werten für Markierungen gefüllt wird.
     
-    
-    # Test#
-    
-    #image <- editImage(image, contrast = -0.3)
-    
-    #for(k in 1:10){
-    #  image.grey <- smoothGreyImage(image.grey = image.grey,
-    #                                direction = "vertical")
-    #  image.grey <- smoothGreyImage(image.grey = image.grey,
-    #                                direction = "horizontal")
-    #}
-    
-    
-    #bis hier
-    
-    
-    # Finde obere Kante
-    xcoords <- seq(dim(image.grey)[2]/4, 3*dim(image.grey)[2]/4, by=4)
-    
-    for(j in xcoords){
-      edge <- findEdge(image.grey = image.grey, xcoord = j,
-                       direction = "down")
-      
-      # Write red mark there in original picture
-      image <- redPosition(image = image, position = edge)
-    }
+    image.information <- array(data = 0, dim = dim(image))
     
     # Schreibe graues Bild und editiertes Farbbild in neuen
     # Ordner
@@ -102,11 +76,18 @@ ageReader <- function(original.directory,
     dir.create(output.directory, showWarnings = FALSE)
     setwd(output.directory)
     
-    writeTIFF(what = image, where = "testbunt.tiff", bits.per.sample = 8L,
-              compression = "none", reduce = TRUE)
-    writeTIFF(what = image.grey, where = "testgrau.tiff", bits.per.sample = 8L,
-              compression = "none", reduce = TRUE)
+    writeTIFF(what = image, where = "testbunt.tiff",
+              bits.per.sample = 8L, compression = "none", reduce = TRUE)
+    writeTIFF(what = image.grey, where = "testgrau.tiff",
+              bits.per.sample = 8L, compression = "none", reduce = TRUE)
+    
+    image.information <- pmax(image, image.information)
+    
+    writeTIFF(what = image.information, where = "testbearbeitet.tiff",
+              bits.per.sample = 8L, compression = "none", reduce = TRUE)
+    
     setwd(.new.directory)
+    
   }
   options(warn=0)
   
