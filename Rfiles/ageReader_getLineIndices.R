@@ -21,7 +21,7 @@ getLineIndices <- function(start.x, start.y,
     
   }else if(end.x == start.x){ # zu 2.
     points <- matrix(c(start.y:end.y))
-    points <- cbind(points, start.x)
+    points <- cbind(start.x, points)
     
   }else{
     

@@ -5,8 +5,9 @@ findEdge <- function(image.information, image.grey,
   
   # Endparameter
   
-  parameter.for.end <- 1.5
+  parameter.for.end <- 1.4
   
+  # results enthaelt (x,y)-Paare
   results <- getLineIndices(start.x = start.pixel[2],
                             start.y = start.pixel[1],
                             end.x = end.pixel[2],

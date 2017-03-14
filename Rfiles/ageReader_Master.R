@@ -44,7 +44,7 @@ ageReader <- function(original.directory,
   file.names <- file.names[grepl("tif", file.names)]
   
   if(require("tiff")){
-    print("The pacakge tiff is loaded correctly.")
+    print("The package tiff is loaded correctly.")
   } else {
     print("Trying to install tiff.")
     install.packages("tiff")
@@ -73,7 +73,7 @@ ageReader <- function(original.directory,
     # Finde den Rand von innen heraus.
     image.information <- scanForEdge(image.grey = image.grey,
                                      image.information = image.information,
-                                     distance = 50)
+                                     distance = 20)
     image.information.copy <- image.information
     
     # Schreibe graues Bild und editiertes Farbbild in neuen
@@ -88,7 +88,14 @@ ageReader <- function(original.directory,
     writeTIFF(what = image.grey, where = "testgrau.tiff",
               bits.per.sample = 8L, compression = "none", reduce = TRUE)
     
-    image.information <- pmax(image, image.information)
+    #image.information <- pmax(image, image.information)
+    image.information <- image + image.information
+    
+    image.information <- ifelse(image.information < 0, 0, image.information)
+    image.information <- ifelse(image.information > 1, 1, image.information)
+    
+    #image.information <- ifelse(image.information == 0, image,
+    #                            image.information)
     
     writeTIFF(what = image.information, where = "testbearbeitet.tiff",
               bits.per.sample = 8L, compression = "none", reduce = TRUE)
