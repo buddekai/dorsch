@@ -57,9 +57,9 @@ ageReader <- function(original.directory,
   
   # Lade Foto in R und bearbeite es
   options(warn=-1)
-  #for(i in 1:length(file.names)){
-  for(i in 1:1){
-    image <- readTIFF(source = file.names, info = FALSE)
+  for(i in 1:length(file.names)){
+  #for(i in 1:1){
+    image <- readTIFF(source = file.names[i], info = FALSE)
     image.copy <- image
     # Als graues Bild abspeichern
     image.grey <- makeGrey(image)
@@ -76,6 +76,8 @@ ageReader <- function(original.directory,
                                      distance = 20)
     image.information.copy <- image.information
     
+    # Umrahme den Otolithen
+    
     # Schreibe graues Bild und editiertes Farbbild in neuen
     # Ordner
     
@@ -83,10 +85,10 @@ ageReader <- function(original.directory,
     dir.create(output.directory, showWarnings = FALSE)
     setwd(output.directory)
     
-    writeTIFF(what = image, where = "testbunt.tiff",
-              bits.per.sample = 8L, compression = "none", reduce = TRUE)
-    writeTIFF(what = image.grey, where = "testgrau.tiff",
-              bits.per.sample = 8L, compression = "none", reduce = TRUE)
+    #writeTIFF(what = image, where = "testbunt.tiff",
+    #          bits.per.sample = 8L, compression = "none", reduce = TRUE)
+    #writeTIFF(what = image.grey, where = "testgrau.tiff",
+    #          bits.per.sample = 8L, compression = "none", reduce = TRUE)
     
     #image.information <- pmax(image, image.information)
     image.information <- image + image.information
@@ -94,10 +96,10 @@ ageReader <- function(original.directory,
     image.information <- ifelse(image.information < 0, 0, image.information)
     image.information <- ifelse(image.information > 1, 1, image.information)
     
-    #image.information <- ifelse(image.information == 0, image,
-    #                            image.information)
+    image.name <- paste(gsub(".tif", "", file.names[i]),
+                        "bearbeitet.tiff", sep="")
     
-    writeTIFF(what = image.information, where = "testbearbeitet.tiff",
+    writeTIFF(what = image.information, where = image.name,
               bits.per.sample = 8L, compression = "none", reduce = TRUE)
     
     setwd(.new.directory)
