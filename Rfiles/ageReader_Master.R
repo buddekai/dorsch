@@ -76,6 +76,8 @@ ageReader <- function(original.directory,
                                      distance = 20)
     image.information.copy <- image.information
     
+    # Umrahme den Otolithen
+    
     # Schreibe graues Bild und editiertes Farbbild in neuen
     # Ordner
     
