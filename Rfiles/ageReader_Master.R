@@ -14,6 +14,7 @@ ageReader <- function(original.directory,
   source("Rfiles\\ageReader_smoothGreyImage.R")
   source("Rfiles\\ageReader_getLineIndices.R")
   source("Rfiles\\ageReader_scanForEdge.R")
+  source("Rfiles\\ageReader_findHyalineRings.R")
   
   # 1. Importiere User-Datei und erweitere Sie um Spalten
   

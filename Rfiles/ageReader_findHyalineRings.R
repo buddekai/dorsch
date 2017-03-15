@@ -1,19 +1,31 @@
 # Funktion um hyaline Ringe zu finden
 
 findHyalineRings <- function(image.grey, image.information,
-                             first.point, second.point){
+                             first.point, second.point, line.to.follow){
   
   
   # Parameter Sektion ####
   parameter.for.hyaline <- 1.1
   
-  # bis hier
+  # Parameter bis hier
   
+  # Die nachfolgende Lösung ist nicht geeignet, da sich die Linien 
+  # wegen leicht verschiedener Anstiege ggf. nicht überschneiden
+  #connecting.line <- getLineIndices(start.x = first.point[1],
+  #                                  start.y = first.point[2],
+  #                                  end.x = second.point[1],
+  #                                  end.y = second.point[2])
   
-  connecting.line <- getLineIndices(start.x = first.point[1],
-                                    start.y = first.point[2],
-                                    end.x = second.point[1],
-                                    end.y = second.point[2])
+  index.of.line.start <- which(first.point[1] == line.to.follow[,1])
+  index.of.line.end <- which(second.point[1] == line.to.follow[,1])
+  
+  if(index.of.line.start < index.of.line.end){
+    connecting.line <-
+      line.to.follow[index.of.line.start:index.of.line.end,]
+  }else{
+    connecting.line <-
+      line.to.follow[index.of.line.end:index.of.line.start,]
+  }
   
   # Mittelwert des Bildes entlang der Linie
   connecting.line.mean <- mean(image.grey[connecting.line[,2],
