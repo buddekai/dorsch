@@ -43,14 +43,14 @@ getLineIndices <- function(start.x, start.y,
         reverse.it <- TRUE
       }
       
-      A <- 2*(end.y-start.y)
-      B <- A - 2*(end.x-start.x)
-      P <- A-(end.x-start.x)
+      A <- 2 * (end.y - start.y)      # 2 * Delta y
+      B <- A - 2 * (end.x - start.x)  # 2 * (Delta y - Delta x)
+      P <- A - (end.x - start.x)      # 2 * Delta y - Delta x
       points <- c(start.x, start.y)
       current.point <- c(start.x, start.y)
       
       while(!isTRUE(all.equal(current.point,c(end.x,end.y)))){
-        if(P < 0){
+        if(P <= 0){
           current.point <- c(current.point[1]+1,current.point[2])
           points <- rbind(points, current.point)
           P <- A + P
@@ -60,7 +60,6 @@ getLineIndices <- function(start.x, start.y,
           P <- B + P
         }
       }
-      
     }
     
     # zu 4.
@@ -86,7 +85,7 @@ getLineIndices <- function(start.x, start.y,
       current.point <- c(start.x, start.y)
       
       while(!isTRUE(all.equal(current.point,c(end.x,end.y)))){
-        if(P < 0){
+        if(P <= 0){
           current.point <- c(current.point[1],current.point[2]+1)
           points <- rbind(points, current.point)
           P <- A + P
@@ -96,7 +95,6 @@ getLineIndices <- function(start.x, start.y,
           P <- B + P
         }
       }
-      
     }
     
     # zu 5.
@@ -123,7 +121,7 @@ getLineIndices <- function(start.x, start.y,
       current.point <- c(start.x, start.y)
       
       while(!isTRUE(all.equal(current.point,c(end.x,end.y)))){
-        if(P < 0){
+        if(P <= 0){
           current.point <- c(current.point[1]+1,current.point[2])
           points <- rbind(points, current.point)
           P <- A + P
@@ -158,7 +156,7 @@ getLineIndices <- function(start.x, start.y,
       current.point <- c(start.x, start.y)
       
       while(!isTRUE(all.equal(current.point,c(end.x,end.y)))){
-        if(P < 0){
+        if(P <= 0){
           current.point <- c(current.point[1],current.point[2]-1)
           points <- rbind(points, current.point)
           P <- A + P
@@ -168,7 +166,6 @@ getLineIndices <- function(start.x, start.y,
           P <- B + P
         }
       }
-
     }
     
   }

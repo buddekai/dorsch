@@ -152,5 +152,15 @@ scanForEdge <- function(image.grey, image.information, distance){
   image.information[cbind(lines[,2], lines[,1], 2)] <- 1
   image.information[cbind(lines[,2], lines[,1], 1)] <- -1
   
+  # Gehe die neuen Linien durch und finde hyaline (helle) Strukturen
+  
+  midpoint <- lines[duplicated(lines)]
+  
+  image.information <- findHyalineRings(image.grey = image.grey,
+                            image.information = image.information,
+                            first.point = midpoint,
+                            second.point = right.point)
+  
+  
   return(image.information)
 }
