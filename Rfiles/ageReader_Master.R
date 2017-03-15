@@ -58,7 +58,7 @@ ageReader <- function(original.directory,
   # Lade Foto in R und bearbeite es
   options(warn=-1)
   for(i in 1:length(file.names)){
-  #for(i in 1:1){
+    #for(i in 1:1){
     image <- readTIFF(source = file.names[i], info = FALSE)
     image.copy <- image
     # Als graues Bild abspeichern
@@ -107,7 +107,7 @@ ageReader <- function(original.directory,
   }
   options(warn=0)
   
-
+  
   setwd(.old.directory)
   # Zuruecksetzen des Pfades
   setwd(original.directory)

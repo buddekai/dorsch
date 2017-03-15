@@ -28,8 +28,8 @@ source("Rfiles/ageReader_Master.R")
 
 start.time <- Sys.time()
 ageReader(original.directory = original.directory,
-                       image.subdirectory = image.subdirectory,
-                       user.file = user.file)
+          image.subdirectory = image.subdirectory,
+          user.file = user.file)
 
 end.time <- Sys.time()
 time.taken <- end.time - start.time
