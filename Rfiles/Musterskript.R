@@ -33,7 +33,7 @@ ageReader(original.directory = original.directory,
 
 end.time <- Sys.time()
 time.taken <- end.time - start.time
-print(paste("Time taken in seconds:", time.taken, sep=" "))
+print(time.taken)
 
 setwd(original.directory)
 
@@ -42,5 +42,7 @@ rm(image.subdirectory,
    original.directory,
    output.directory,
    user.file,
-   start.time, end.time, time.taken)
+   start.time,
+   end.time,
+   time.taken)
 

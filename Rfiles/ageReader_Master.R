@@ -58,12 +58,13 @@ ageReader <- function(original.directory,
   
   # Lade Foto in R und bearbeite es
   options(warn=-1)
-  #for(i in 1:length(file.names)){
-  for(i in 1:1){
+  for(i in 1:length(file.names)){
+  #for(i in 5:5){
     image <- readTIFF(source = file.names[i], info = FALSE)
     image.copy <- image
     # Als graues Bild abspeichern
-    image.grey <- makeGrey(image)
+    image.grey <- makeGrey(image = image, grey.mode = "blue.grey")
+    image.grey2 <- makeGrey(image = image, grey.mode = "red.grey")
     image.grey.copy <- image.grey
     
     # Speichere ein farbiges Bild mit Nullen ab, das nach und nach mit
@@ -74,7 +75,8 @@ ageReader <- function(original.directory,
     # Finde den Rand von innen heraus.
     image.information <- scanForEdge(image.grey = image.grey,
                                      image.information = image.information,
-                                     distance = 20)
+                                     distance = 20,
+                                     image.grey2 = image.grey2)
     image.information.copy <- image.information
     
     # Umrahme den Otolithen

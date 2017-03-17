@@ -2,7 +2,7 @@
 # Danach zeichnet es das umrahmende Rechteck ins Bild.
 
 
-scanForEdge <- function(image.grey, image.information, distance){
+scanForEdge <- function(image.grey, image.information, distance, image.grey2){
   
   # Parameter für mittleren Abstandsabweichung
   
@@ -120,14 +120,15 @@ scanForEdge <- function(image.grey, image.information, distance){
   bottom.y <- max(df.edge$y1[df.edge$outlier==0])
   left.x <- min(df.edge$x1[df.edge$outlier==0])
   
+  
   top.border <- getLineIndices(start.x = left.x, start.y = top.y,
-                              end.x = right.x, end.y = top.y)
+                               end.x = right.x, end.y = top.y)
   right.border <- getLineIndices(start.x = right.x, start.y = top.y,
-                               end.x = right.x, end.y = bottom.y)
+                                 end.x = right.x, end.y = bottom.y)
   bottom.border <- getLineIndices(start.x = right.x, start.y = bottom.y,
-                               end.x = left.x, end.y = bottom.y)
+                                  end.x = left.x, end.y = bottom.y)
   left.border <- getLineIndices(start.x = left.x, start.y = bottom.y,
-                               end.x = left.x, end.y = top.y)
+                                end.x = left.x, end.y = top.y)
   
   border <- rbind(top.border, right.border, bottom.border, left.border)
   
@@ -135,32 +136,58 @@ scanForEdge <- function(image.grey, image.information, distance){
   image.information[cbind(border[,2], border[,1], 2)] <- 1
   image.information[cbind(border[,2], border[,1], 1)] <- -1
   
-  # Fuege neue Schnittlinien hinzu
-  left.point <- c(left.x, df.edge$y1[df.edge$x1 == left.x])
-  right.point <- c(right.x, df.edge$y1[df.edge$x1 == right.x])
+  # Arbeite nur weiter, wenn kein gefundener Rand am Rand des Bildes liegt.
   
-  first.line <- getLineIndices(start.x = left.point[1],
-                               start.y = left.point[2],
-                               end.x = right.x, end.y = top.y)
-  
-  second.line <- getLineIndices(start.x = right.point[1],
-                               start.y = right.point[2],
-                               end.x = left.x, end.y = top.y)
-  
-  lines <- rbind(first.line, second.line)
-  image.information[cbind(lines[,2], lines[,1], 3)] <- -1
-  image.information[cbind(lines[,2], lines[,1], 2)] <- 1
-  image.information[cbind(lines[,2], lines[,1], 1)] <- -1
-  
-  # Gehe die neuen Linien durch und finde hyaline (helle) Strukturen
-  
-  midpoint <- lines[duplicated(lines)]
-  
-  image.information <- findHyalineRings(image.grey = image.grey,
-                            image.information = image.information,
-                            first.point = midpoint,
-                            second.point = right.point,
-                            line.to.follow = second.line)
+  if(top.y == 0 || right.x == dim(image.grey)[2] ||
+     bottom.y == dim(image.grey)[1] || left.x == 0){
+    
+    image.corrupted <- TRUE
+    
+    
+  }else{
+    
+    # Fuege neue Schnittlinien hinzu
+    left.point <- c(left.x, df.edge$y1[df.edge$x1 == left.x])
+    right.point <- c(right.x, df.edge$y1[df.edge$x1 == right.x])
+    
+    first.line <- getLineIndices(start.x = left.point[1],
+                                 start.y = left.point[2],
+                                 end.x = right.x, end.y = top.y)
+    
+    second.line <- getLineIndices(start.x = right.point[1],
+                                  start.y = right.point[2],
+                                  end.x = left.x, end.y = top.y)
+    
+    lines <- rbind(first.line, second.line)
+    image.information[cbind(lines[,2], lines[,1], 3)] <- -1
+    image.information[cbind(lines[,2], lines[,1], 2)] <- 1
+    image.information[cbind(lines[,2], lines[,1], 1)] <- -1
+    
+    # Gehe die neuen Linien durch und finde hyaline (helle) Strukturen
+    
+    midpoint <- lines[duplicated(lines)]
+    
+    # rechte Linie
+    image.information <- findHyalineRings(
+      image.grey = image.grey, image.information = image.information,
+      first.point = midpoint, second.point = right.point,
+      line.to.follow = second.line,
+      parameter.for.hyaline = 1.1,
+      points.to.jump = 5,
+      repeate.fill.up = 2,
+      min.hyaline.length = 48)
+    
+    # linke Linie
+    image.information <- findHyalineRings(
+      image.grey = image.grey2, image.information = image.information,
+      first.point = midpoint, second.point = left.point,
+      line.to.follow = first.line,
+      parameter.for.hyaline = 1.1,
+      points.to.jump = 5,
+      repeate.fill.up = 2,
+      min.hyaline.length = 20)
+    
+  }
   
   
   return(image.information)
