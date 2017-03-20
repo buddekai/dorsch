@@ -169,23 +169,23 @@ scanForEdge <- function(image.grey, image.information, distance, image.grey2){
     
     # rechte Linie
     image.information <- findHyalineRings(
-      image.grey = image.grey, image.information = image.information,
+      image.grey = image.grey2, image.information = image.information,
       first.point = midpoint, second.point = right.point,
       line.to.follow = second.line,
-      parameter.for.hyaline = 1.1,
+      parameter.for.hyaline = 1.07,
       points.to.jump = 5,
       repeate.fill.up = 2,
-      min.hyaline.length = 48)
+      min.hyaline.length = 30)
     
     # linke Linie
     image.information <- findHyalineRings(
       image.grey = image.grey2, image.information = image.information,
       first.point = midpoint, second.point = left.point,
       line.to.follow = first.line,
-      parameter.for.hyaline = 1.1,
+      parameter.for.hyaline = 1.07,
       points.to.jump = 5,
       repeate.fill.up = 2,
-      min.hyaline.length = 20)
+      min.hyaline.length = 30)
     
   }
   

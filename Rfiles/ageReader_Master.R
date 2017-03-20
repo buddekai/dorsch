@@ -60,7 +60,7 @@ ageReader <- function(original.directory,
   # Lade Foto in R und bearbeite es
   options(warn=-1)
   for(i in 1:length(file.names)){
-  #for(i in 5:5){
+  #for(i in 2:2){
     image <- readTIFF(source = file.names[i], info = FALSE)
     image.copy <- image
     # Als graues Bild abspeichern
