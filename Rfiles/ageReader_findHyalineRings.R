@@ -42,6 +42,11 @@ findHyalineRings <- function(image.grey, image.information,
     connecting.line[,2] <- rev(connecting.line[,2])
   }
   
+  # Farbwerte entlang der Linie mitteln
+  
+  image.grey <- smoothGreyLine(image.grey = image.grey,
+                               connecting.line = connecting.line)
+  
   # Mittelwert des Bildes entlang der Linie
   connecting.line.mean <- mean(image.grey[connecting.line[,2],
                                           connecting.line[,1]])
