@@ -5,7 +5,9 @@ findHyalineRings <- function(image.grey, image.information,
                              parameter.for.hyaline,
                              points.to.jump,
                              repeate.fill.up,
-                             min.hyaline.length){
+                             min.hyaline.length,
+                             df.results,
+                             current.line){
   
 
   
@@ -248,6 +250,17 @@ findHyalineRings <- function(image.grey, image.information,
     }
   }
   
+  # Fuer Testzwecke ab hier:
+  number.of.rings <- max(df.connecting.line$ring)
+  if(first.point[1] < second.point[1]){
+    # rechte Linie
+    df.results$RingsRight[current.line] <- number.of.rings
+  }else{
+    df.results$RingsLeft[current.line] <- number.of.rings
+  }
+  
+  
+  # Bis hier
   
   # Fuege die Information (hyaline Ringe) zu image.information hinzu
   
@@ -260,6 +273,6 @@ findHyalineRings <- function(image.grey, image.information,
   
   
   
-  return(image.information)
+  return(list(image.information, df.results))
   
 }

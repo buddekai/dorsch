@@ -2,7 +2,14 @@
 # Danach zeichnet es das umrahmende Rechteck ins Bild.
 
 
-scanForEdge <- function(image.grey, image.information, distance, image.grey2){
+scanForEdge <- function(image.grey, image.information, distance,
+                        image.grey2,
+                        parameter.for.hyaline,
+                        points.to.jump,
+                        repeate.fill.up,
+                        min.hyaline.length,
+                        df.results,
+                        current.line){
   
   # Parameter für mittleren Abstandsabweichung
   
@@ -168,27 +175,37 @@ scanForEdge <- function(image.grey, image.information, distance, image.grey2){
     midpoint <- lines[duplicated(lines)]
     
     # rechte Linie
-    image.information <- findHyalineRings(
+    function.results <- findHyalineRings(
       image.grey = image.grey2, image.information = image.information,
       first.point = midpoint, second.point = right.point,
       line.to.follow = second.line,
-      parameter.for.hyaline = 1.07,
-      points.to.jump = 5,
-      repeate.fill.up = 2,
-      min.hyaline.length = 30)
+      parameter.for.hyaline = parameter.for.hyaline,
+      points.to.jump = points.to.jump,
+      repeate.fill.up = repeate.fill.up,
+      min.hyaline.length = min.hyaline.length,
+      df.results,
+      current.line)
+    
+    image.information <- function.results[[1]]
+    df.results <- function.results[[2]]
     
     # linke Linie
-    image.information <- findHyalineRings(
+    function.results <- findHyalineRings(
       image.grey = image.grey2, image.information = image.information,
       first.point = midpoint, second.point = left.point,
       line.to.follow = first.line,
-      parameter.for.hyaline = 1.07,
-      points.to.jump = 5,
-      repeate.fill.up = 2,
-      min.hyaline.length = 30)
+      parameter.for.hyaline = parameter.for.hyaline,
+      points.to.jump = points.to.jump,
+      repeate.fill.up = repeate.fill.up,
+      min.hyaline.length = min.hyaline.length,
+      df.results,
+      current.line)
+    
+    image.information <- function.results[[1]]
+    df.results <- function.results[[2]]
     
   }
   
   
-  return(image.information)
+  return(list(image.information, df.results))
 }

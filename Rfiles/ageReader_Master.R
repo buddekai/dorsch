@@ -2,7 +2,12 @@
 
 ageReader <- function(original.directory,
                       image.subdirectory,
-                      user.file){
+                      user.file,
+                      parameter.for.hyaline,
+                      points.to.jump,
+                      repeate.fill.up,
+                      min.hyaline.length,
+                      df.results){
   
   # 0. Grundlagen ###
   
@@ -46,7 +51,7 @@ ageReader <- function(original.directory,
   file.names <- file.names[grepl("tif", file.names)]
   
   if(require("tiff")){
-    print("The package tiff is loaded correctly.")
+    #print("The package tiff is loaded correctly.")
   } else {
     print("Trying to install tiff.")
     install.packages("tiff")
@@ -73,12 +78,63 @@ ageReader <- function(original.directory,
     
     image.information <- array(data = 0, dim = dim(image))
     
+    
     # Finde den Rand von innen heraus.
-    image.information <- scanForEdge(image.grey = image.grey,
-                                     image.information = image.information,
-                                     distance = 20,
-                                     image.grey2 = image.grey2)
+    current.line <- 4 * (run - 1) + i
+    function.results <- scanForEdge(image.grey = image.grey,
+                                    image.information = image.information,
+                                    distance = 20,
+                                    image.grey2 = image.grey2,
+                                    parameter.for.hyaline,
+                                    points.to.jump,
+                                    repeate.fill.up,
+                                    min.hyaline.length,
+                                    df.results,
+                                    current.line)
+    
+    image.information <- function.results[[1]]
+    df.results <- function.results[[2]]
+    
     image.information.copy <- image.information
+    
+    
+    
+    
+    # Für Testzwecke ab hier
+    df.results$Image[current.line] <- file.names[i]
+    df.results$HyalinePar[current.line] <- parameter.for.hyaline
+    df.results$Jump[current.line] <- points.to.jump
+    df.results$Repeate[current.line] <- repeate.fill.up
+    df.results$MinLength[current.line] <- min.hyaline.length
+    
+    if(df.results$RingsLeft[current.line] ==
+       df.results$RingsRight[current.line]){
+      df.results$EqualRings[current.line] <- 1
+    }else{
+      0
+    }
+    
+    if(i == 1 && df.results$EqualRings[current.line] == 1 &&
+       df.results$RingsLeft[current.line] == 4){
+      df.results$AllRings[current.line] <-  1
+    }
+    if(i == 2 && df.results$EqualRings[current.line] == 1 &&
+       df.results$RingsLeft[current.line] == 3){
+      df.results$AllRings[current.line] <-  1
+    }
+    if(i == 2 && df.results$EqualRings[current.line] == 1 &&
+       df.results$RingsLeft[current.line] == 4){
+      df.results$AllRings[current.line] <-  1
+    }
+    if(i == 2 && df.results$EqualRings[current.line] == 1 &&
+       df.results$RingsLeft[current.line] == 4){
+      df.results$AllRings[current.line] <-  1
+    }
+    
+    # Bis hier
+    
+    
+    
     
     # Umrahme den Otolithen
     
@@ -100,7 +156,8 @@ ageReader <- function(original.directory,
     image.information <- ifelse(image.information < 0, 0, image.information)
     image.information <- ifelse(image.information > 1, 1, image.information)
     
-    image.name <- paste(gsub(".tif", "", file.names[i]),
+    image.name <- paste(gsub(".tif", "", file.names[i]), "Zeile",
+                        current.line,
                         "bearbeitet.tiff", sep="")
     
     writeTIFF(what = image.information, where = image.name,
@@ -116,5 +173,5 @@ ageReader <- function(original.directory,
   # Zuruecksetzen des Pfades
   setwd(original.directory)
   
-  
+  return(df.results)
 }
