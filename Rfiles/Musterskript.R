@@ -37,11 +37,11 @@ start.time <- Sys.time()
 #test.repeate.fill.up <- c(2)
 #test.min.hyaline.length <- c(20, 40)
 
-#test.parameter.for.hyaline <- c(1.0, 1.01, 1.02, 1.04, 1.08, 1.2)
-test.parameter.for.hyaline <- c(1.02, 1.08)
+#test.parameter.for.hyaline <- c(1.0, 1.2)
+test.parameter.for.hyaline <- c(1.01, 1.02, 1.04, 1.08)
 test.points.to.jump <- c(1, 2, 3, 5, 7, 9)
 test.repeate.fill.up <- c(1,2)
-test.min.hyaline.length <- c(10, 20, 40, 50, 60)
+test.min.hyaline.length <- c(10, 20, 40)
 
 runs <- length(test.parameter.for.hyaline) * length(test.points.to.jump) *
   length(test.repeate.fill.up) * length(test.min.hyaline.length)
