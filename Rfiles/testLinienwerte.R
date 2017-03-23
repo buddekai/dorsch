@@ -23,10 +23,14 @@ repeate.fill.up <- 2
 # Punkte nach dem ersten Ring, unter denen ein Minimum gesucht wird
 points.to.look.for.minimum <- 20
 
+# Punkte, die am Ende uebersprungen werden koennen, wenn die Werte ueber dem
+# Mittelwert liegen
+points.for.reconnecting <- 20
+
 # Starte Funktion hier ######
 
 # Lade die Linie mit dem Ergebnis: "Linienwerte"
-load("input/Bild3Linie1.RData")
+load("input/Bild1Linie2.RData")
 
 Linienwerte <- Linienwerte[1:(length(Linienwerte)-remove.points)]
 Linienwerte.copy <- Linienwerte
@@ -45,10 +49,13 @@ Linienwerte.copy2 <- Linienwerte
 plot(Linienwerte.copy2, pch = 4)
 
 # Glaetten der Kurve
-for(i in 1:(length(Linienwerte)-2)){
-  Linienwerte[i+1] <- 0.5 * Linienwerte[i+1] +
-    0.25 * (Linienwerte[i] + Linienwerte[i+2])
+for(j in 1:100){
+  for(i in 1:(length(Linienwerte)-2)){
+    Linienwerte[i+1] <- 0.5 * Linienwerte[i+1] +
+      0.25 * (Linienwerte[i] + Linienwerte[i+2])
+  }
 }
+
 
 Linienwerte.copy3 <- Linienwerte
 plot(Linienwerte.copy3, pch = 4)
@@ -155,15 +162,51 @@ for(i in 1:length(df.Linienwerte$ring)){
 
 # Loesche alle Ringe, die kleiner sind als
 
-# TODO
+# TODO oder auch nicht.
 
 
 
 # Ringe finden Teil 2 ####
-# untersuche noch einmal alle Punkte nach dem ersten Ring.
+# untersuche noch einmal alle Punkte nach dem Minimum des ersten Ringes.
+
+# Finde alle Maxima und Minima nach dem ersten Ring.
 
 last.index.of.first.ring <-
   which(df.Linienwerte$ring == 1)[length(which(df.Linienwerte$ring == 1))]
+
+index.of.minima <- NULL
+index.of.maxima <- NULL
+
+dummy.min <- df.Linienwerte$value[last.index.of.first.ring]
+dummy.max <- 0
+dummy.counter <- 0
+
+for(i in last.index.of.first.ring : (length(df.Linienwerte$value) -
+                                     points.to.look.for.minimum)){
+  
+  current.value <- df.Linienwerte$value[i]
+  
+  if(current.value < dummy.min){
+    dummy.min <- df.Linienwerte$value[i]
+    if(all(dummy.min < df.Linienwerte$value[i:(i+points.to.look.for.minimum)])){
+      
+    }
+  }
+  
+  
+  
+}
+
+dummy.range <- i:(i+points.to.look.for.minimum)
+min.of.range <- min(df.Linienwerte$value[dummy.range])
+dummy.min.index <- which(df.Linienwerte$value == min.of.range)
+dummy.min.index <- dummy.min.index[dummy.min.index %in% dummy.range]
+
+
+### Bis hier ######
+
+
+
 index.range <- last.index.of.first.ring : 
                   (last.index.of.first.ring + points.to.look.for.minimum)
 
@@ -172,6 +215,8 @@ first.ring.minimum <-
           min(df.Linienwerte$value[index.range]))
 first.ring.minimum <- first.ring.minimum[
   first.ring.minimum %in% index.range]
+
+
 
 index.range <- first.ring.minimum:nrow(df.Linienwerte)
 
@@ -261,13 +306,58 @@ for(i in 1:length(df.Linienwerte$ring)){
   }
 }
 
-# Loesche Ringe, die zu dicht beieinander sind.
+# Loesche Ringe, die zu dicht beieinander sind. ####
+
+number.of.rings <- max(df.Linienwerte$ring)
+
+for(i in 1:(number.of.rings-1)){
+  last.point <- which(df.Linienwerte$ring == (i))[
+    length(which(df.Linienwerte$ring == (i)))]
+  first.point <- which(df.Linienwerte$ring == (i+1))[1]
+  ring.seperating.points <- first.point - last.point - 1
+  
+  if(ring.seperating.points < points.for.reconnecting){
+    if(all(df.Linienwerte$value[last.point:first.point] >
+           mean(df.Linienwerte$value))){
+      df.Linienwerte$ring[last.point:first.point] <- 1
+    }
+  }
+}
 
 
+# Zaehle erneut Ringe ####
+
+ring <- 1
+if(df.Linienwerte$ring[1] != 0){
+  ring.change <- TRUE
+}else{
+  ring.change <- FALSE
+}
+
+
+for(i in 1:length(df.Linienwerte$ring)){
+  
+  if(df.Linienwerte$ring[i] == 0){
+    
+    if(ring.change == TRUE){
+      ring.change <- FALSE
+      ring <- ring + 1
+    }
+    
+  }else{
+    df.Linienwerte$ring[i] <- ring
+    
+    if(ring.change == FALSE){
+      ring.change <- TRUE
+    }
+  }
+}
+
+number.of.rings <- max(df.Linienwerte$ring)
 
 # Plotte abschliessendes Bild ####
 
-number.of.rings <- max(df.Linienwerte$ring)
+
 
 df.Linienwerte.copy <- df.Linienwerte
 df.Linienwerte.copy$value[df.Linienwerte.copy$ring == 0] <- 0
