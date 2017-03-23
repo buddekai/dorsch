@@ -14,7 +14,7 @@ findHyalineRings <- function(image.grey, image.information,
   # Parameter Sektion ####
   #parameter.for.hyaline <- 1.1
   #points.to.jump <- 5
-  #wie oft soll versucht werden die Lücken zuschliessen:
+  #wie oft soll versucht werden die Luecken zuschliessen:
   #repeate.fill.up <- 2
   # Wie lang soll eine zusammenhaengende Markierung mindestens sein?
   #min.hyaline.length <- 48
@@ -45,6 +45,14 @@ findHyalineRings <- function(image.grey, image.information,
   }
   
   # Farbwerte entlang der Linie mitteln
+  #Linienwerte <- rep(0, length(connecting.line[,2]))
+  #for(i in 1:length(connecting.line[,2])){
+  #Linienwerte[i] <- image.grey[connecting.line[i,2],
+  #                             connecting.line[i,1]] 
+  #}
+  #browser()
+  
+  
   
   image.grey <- smoothGreyLine(image.grey = image.grey,
                                connecting.line = connecting.line)
@@ -52,6 +60,18 @@ findHyalineRings <- function(image.grey, image.information,
   # Mittelwert des Bildes entlang der Linie
   connecting.line.mean <- mean(image.grey[connecting.line[,2],
                                           connecting.line[,1]])
+  
+  max.value <- max(image.grey[connecting.line[,2],
+                              connecting.line[,1]])
+  min.value <- min(image.grey[connecting.line[,2],
+                              connecting.line[,1]])
+  if(max.value > 1.0){
+    print("Ohh, der Max-Wert ist viel zu gross.")
+  }
+  if(min.value < 0){
+    print("Ohh, der Min-Wert ist viel zu niedrig.")
+  }
+  
   
   number.of.points.along.line <- dim(connecting.line)[1]
   df.connecting.line <- data.frame(connecting.line)
@@ -116,7 +136,7 @@ findHyalineRings <- function(image.grey, image.information,
   # Loesche die kuerze zweier Markierungen, die zu dicht beieinanderliegen
   df.connecting.line$ring <- 0
   ring <- 1
-  if(df.connecting.line$hyaline == 1){
+  if(df.connecting.line$hyaline[1] == 1){
     ring.change <- TRUE
   }else{
     ring.change <- FALSE
@@ -175,7 +195,7 @@ findHyalineRings <- function(image.grey, image.information,
   # Loesche alle Ringe, die zu nah am Start- oder Endpunkt sind
   df.connecting.line$ring <- 0
   ring <- 1
-  if(df.connecting.line$hyaline == 1){
+  if(df.connecting.line$hyaline[1] == 1){
     ring.change <- TRUE
   }else{
     ring.change <- FALSE
@@ -224,7 +244,7 @@ findHyalineRings <- function(image.grey, image.information,
   
   df.connecting.line$ring <- 0
   ring <- 1
-  if(df.connecting.line$hyaline == 1){
+  if(df.connecting.line$hyaline[1] == 1){
     ring.change <- TRUE
   }else{
     ring.change <- FALSE
