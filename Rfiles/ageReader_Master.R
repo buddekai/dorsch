@@ -35,7 +35,7 @@ ageReader <- function(original.directory,
   df.user.file$OUTER_ZONE <- ""
   df.user.file$READABILITY <- ""
   
-  df.user.file$IMPORTED <- NA
+  df.user.file$PROCESSED <- NA
   
   # 2. Importiere Fotos und untersuche diese ###
   
