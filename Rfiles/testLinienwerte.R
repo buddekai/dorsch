@@ -161,13 +161,11 @@ for(i in 1:length(df.Linienwerte$ring)){
 }
 
 # Loesche alle Ringe, die kleiner sind als
-
 # TODO oder auch nicht.
 
 
-
 # Ringe finden Teil 2 ####
-# untersuche noch einmal alle Punkte nach dem Minimum des ersten Ringes.
+# untersuche noch einmal alle Punkte nach dem Maximum des ersten Ringes.
 
 # Finde alle Maxima und Minima nach dem ersten Ring.
 
@@ -177,30 +175,160 @@ last.index.of.first.ring <-
 index.of.minima <- NULL
 index.of.maxima <- NULL
 
+final.index.of.minima <- NULL
+final.index.of.maxima <- NULL
+
 dummy.min <- df.Linienwerte$value[last.index.of.first.ring]
 dummy.max <- 0
 dummy.counter <- 0
 
+find.min <- TRUE
+find.max <- FALSE
+
+
+df.Linienwerte$Anstieg <- NA
 for(i in last.index.of.first.ring : (length(df.Linienwerte$value) -
                                      points.to.look.for.minimum)){
   
-  current.value <- df.Linienwerte$value[i]
-  
-  if(current.value < dummy.min){
-    dummy.min <- df.Linienwerte$value[i]
-    if(all(dummy.min < df.Linienwerte$value[i:(i+points.to.look.for.minimum)])){
-      
+  if(df.Linienwerte$value[i] > df.Linienwerte$value[i-1]){
+    df.Linienwerte$Anstieg[i] <- "up"
+    
+    if(find.min){
+      index.of.minima <- c(index.of.minima, i-1)
+      find.min <- FALSE
     }
+    find.max <- TRUE
+    
+  }else{
+    df.Linienwerte$Anstieg[i] <- "down"
+    
+    if(find.max){
+      index.of.maxima <- c(index.of.maxima, i-1)
+      find.max <- FALSE
+    }
+    find.min <- TRUE
   }
-  
-  
   
 }
 
-dummy.range <- i:(i+points.to.look.for.minimum)
-min.of.range <- min(df.Linienwerte$value[dummy.range])
-dummy.min.index <- which(df.Linienwerte$value == min.of.range)
-dummy.min.index <- dummy.min.index[dummy.min.index %in% dummy.range]
+df.Linienwerte$max <- 0
+df.Linienwerte$min <- 0
+
+df.Linienwerte$max[index.of.maxima] <- 1
+df.Linienwerte$min[index.of.minima] <- 1
+
+# Loesche Extrema, die keine richtigen sind.
+if(length(index.of.minima) == length(index.of.maxima)){
+  if(index.of.minima[1] < index.of.maxima[1]){
+    if(length(index.of.minima) > 1){
+      for(i in 1:length(index.of.maxima)){
+        if(i %% 2 == 1 && df.Linienwerte$min[index.of.minima[i]] == 1){
+          # Finde richtiges Minimum
+          dum.current.max <- df.Linienwerte$value[index.of.maxima[i]]
+          dum.current.min <- df.Linienwerte$value[index.of.minima[i]]
+          dum.current.fraction <- dum.current.max / dum.current.min
+          
+          # Wenn der Unterschied nicht gross genug ist, so loesche das Maximum
+          # und waehle das kleinste Minimum
+          if(dum.current.fraction < par.hyaline){
+            
+            df.Linienwerte$max[index.of.maxima[i]] <- 0
+            
+            if(df.Linienwerte$value[index.of.minima[i]] <
+               df.Linienwerte$value[index.of.minima[i+1]]){
+              df.Linienwerte$min[index.of.minima[i+1]] <- 0
+            }else{
+              df.Linienwerte$min[index.of.minima[i]] <- 0
+            }
+          }
+        }
+        
+        if(i %% 2 == 0 && df.Linienwerte$min[index.of.maxima[i]] == 1){
+          # Finde richtiges Maximum
+          dum.current.max <- df.Linienwerte$value[index.of.maxima[i]]
+          dum.current.min <- df.Linienwerte$value[index.of.minima[i+1]]
+          dum.current.fraction <- dum.current.max / dum.current.min
+          
+          # Wenn der Unterschied nicht gross genug ist, so loesche das Maximum
+          # und waehle das kleinste Minimum
+          if(dum.current.fraction < par.hyaline){
+            
+            df.Linienwerte$max[index.of.maxima[i]] <- 0
+            
+            if(df.Linienwerte$value[index.of.minima[i]] <
+               df.Linienwerte$value[index.of.minima[i+1]]){
+              df.Linienwerte$min[index.of.minima[i+1]] <- 0
+            }else{
+              df.Linienwerte$min[index.of.minima[i]] <- 0
+            }
+          }
+        }
+      }
+    }
+  }else{
+    print("Es wurde nach dem ersten Maximum kein Minimum gefunden!")
+  }
+}else{
+  print("Es wurden nicht gleich viele Extrema gefunden.")
+}
+
+
+# Finde Ringe zwischen zwei Minima
+# Berechne den Mittelwert aus allen Punkten zwischen zwei Maxima
+
+for(i in 1:(sum(df.Linienwerte$max)-1)){
+  
+  if(i==1){
+    current.range <-
+      last.index.of.first.ring:which(df.Linienwerte$max==1)[1]
+  }else{
+    current.range <-
+      which(df.Linienwerte$max==1)[i-1]:which(df.Linienwerte$max==1)[i]
+  }
+  
+  current.mean.value <- mean(df.Linienwerte$value[current.range])
+  
+  # Markiere den Ring zwischen zwei Minima
+  current.range <-
+    which(df.Linienwerte$min==1)[i]:which(df.Linienwerte$min==1)[i+1]
+  
+  
+  
+  copy.par.hyaline <- par.hyaline
+  current.range.ring <- which(
+    df.Linienwerte$value[current.range] > par.hyaline * current.mean.value)
+  while(length(current.range.ring)==0){
+    par.hyaline <- ((par.hyaline - 1)/2+1)
+    current.range.ring <- which(
+      df.Linienwerte$value[current.range] > par.hyaline * current.mean.value)
+  }
+  par.hyaline <- copy.par.hyaline
+  
+  df.Linienwerte$ring[current.range[current.range.ring]] <- 1
+}
+
+# Finde den letzten Ring #####
+current.range <-
+  which(df.Linienwerte$min==1)[sum(df.Linienwerte$min)]:
+  (length(df.Linienwerte$value)-points.to.look.for.minimum)
+current.mean.value <- mean(df.Linienwerte$value[current.range])
+
+# Markiere den Ring zwischen zwei Minima
+current.range.ring <- which(
+  df.Linienwerte$value[current.range] > par.hyaline * current.mean.value)
+
+# Falls das Maximum nicht gross genug ist.
+copy.par.hyaline <- par.hyaline
+current.range.ring <- which(
+  df.Linienwerte$value[current.range] > par.hyaline* current.mean.value)
+while(length(current.range.ring)==0){
+  par.hyaline <- ((par.hyaline - 1)/2+1)
+  current.range.ring <- which(
+    df.Linienwerte$value[current.range] > par.hyaline* current.mean.value)
+}
+par.hyaline <- copy.par.hyaline
+
+df.Linienwerte$ring[current.range[current.range.ring]] <- 1
 
 
 ### Bis hier ######
