@@ -30,7 +30,7 @@ points.for.reconnecting <- 20
 # Starte Funktion hier ######
 
 # Lade die Linie mit dem Ergebnis: "Linienwerte"
-load("input/Bild1Linie2.RData")
+load("input/Bild4Linie2.RData")
 
 Linienwerte <- Linienwerte[1:(length(Linienwerte)-remove.points)]
 Linienwerte.copy <- Linienwerte
@@ -65,7 +65,11 @@ plot(Linienwerte.copy3, pch = 4)
 # Schliesse alle möglichen Lücken
 df.Linienwerte <- data.frame(value = Linienwerte)
 
-limit1 <-  par.hyaline * mean(Linienwerte)
+# Benutze nur die Punkte die weniger als die Hälfte vom Bildrand entfernt
+# liegen
+find.first.ring.within <- as.integer(nrow(df.Linienwerte)/2)
+
+limit1 <-  par.hyaline * mean(Linienwerte[1:find.first.ring.within])
 
 df.Linienwerte$ring <- ifelse(Linienwerte > limit1, 1, 0)
 
@@ -160,8 +164,62 @@ for(i in 1:length(df.Linienwerte$ring)){
   }
 }
 
-# Loesche alle Ringe, die kleiner sind als
-# TODO oder auch nicht.
+
+# Loesche Ringe, die zu dicht beieinander sind. ####
+
+number.of.rings <- max(df.Linienwerte$ring)
+
+if(number.of.rings > 1){
+  for(i in 1:(number.of.rings-1)){
+    last.point <- which(df.Linienwerte$ring == (i))[
+      length(which(df.Linienwerte$ring == (i)))]
+    first.point <- which(df.Linienwerte$ring == (i+1))[1]
+    ring.seperating.points <- first.point - last.point - 1
+    
+    if(ring.seperating.points < points.for.reconnecting){
+      if(all(df.Linienwerte$value[last.point:first.point] >
+             mean(df.Linienwerte$value))){
+        df.Linienwerte$ring[last.point:first.point] <- 1
+      }
+    }
+  }
+}
+
+
+# Zaehle erneut Ringe ####
+
+ring <- 1
+if(df.Linienwerte$ring[1] != 0){
+  ring.change <- TRUE
+}else{
+  ring.change <- FALSE
+}
+
+
+for(i in 1:length(df.Linienwerte$ring)){
+  
+  if(df.Linienwerte$ring[i] == 0){
+    
+    if(ring.change == TRUE){
+      ring.change <- FALSE
+      ring <- ring + 1
+    }
+    
+  }else{
+    df.Linienwerte$ring[i] <- ring
+    
+    if(ring.change == FALSE){
+      ring.change <- TRUE
+    }
+  }
+}
+
+number.of.rings <- max(df.Linienwerte$ring)
+
+
+# Loesche alle Ringe, die nicht der erste Ring sind
+
+df.Linienwerte$ring[df.Linienwerte$ring != 1] <- 0
 
 
 # Ringe finden Teil 2 ####
@@ -217,52 +275,110 @@ df.Linienwerte$min <- 0
 df.Linienwerte$max[index.of.maxima] <- 1
 df.Linienwerte$min[index.of.minima] <- 1
 
+# Loesche letztes Minimum, falls eins zu viel ist.
+if((length(index.of.minima) - 1) == length(index.of.maxima)){
+  df.Linienwerte$min[index.of.minima[length(index.of.minima)]] <- 0
+  index.of.minima <- index.of.minima[-length(index.of.minima)]
+}
+
+
+
 # Loesche Extrema, die keine richtigen sind.
 if(length(index.of.minima) == length(index.of.maxima)){
   if(index.of.minima[1] < index.of.maxima[1]){
     if(length(index.of.minima) > 1){
-      for(i in 1:length(index.of.maxima)){
-        if(i %% 2 == 1 && df.Linienwerte$min[index.of.minima[i]] == 1){
-          # Finde richtiges Minimum
-          dum.current.max <- df.Linienwerte$value[index.of.maxima[i]]
-          dum.current.min <- df.Linienwerte$value[index.of.minima[i]]
-          dum.current.fraction <- dum.current.max / dum.current.min
+      
+      i <- 1
+      
+      # Beginn: aufsteigender Ast, finde richtiges Minimum
+      while(i == 1){
+        
+        # Finde richtiges Minimum
+        dum.current.max <- df.Linienwerte$value[index.of.maxima[i]]
+        dum.current.min <- df.Linienwerte$value[index.of.minima[i]]
+        dum.current.fraction <- dum.current.max / dum.current.min
+        
+        # Wenn der Unterschied nicht gross genug ist, so loesche das Maximum
+        # und waehle das kleinste Minimum
+        if(dum.current.fraction < par.hyaline){
           
-          # Wenn der Unterschied nicht gross genug ist, so loesche das Maximum
-          # und waehle das kleinste Minimum
-          if(dum.current.fraction < par.hyaline){
-            
-            df.Linienwerte$max[index.of.maxima[i]] <- 0
-            
-            if(df.Linienwerte$value[index.of.minima[i]] <
-               df.Linienwerte$value[index.of.minima[i+1]]){
-              df.Linienwerte$min[index.of.minima[i+1]] <- 0
-            }else{
-              df.Linienwerte$min[index.of.minima[i]] <- 0
-            }
+          df.Linienwerte$max[index.of.maxima[i]] <- 0
+          index.of.maxima <- index.of.maxima[-i]
+          
+          if(df.Linienwerte$value[index.of.minima[i]] <
+             df.Linienwerte$value[index.of.minima[i+1]]){
+            df.Linienwerte$min[index.of.minima[i+1]] <- 0
+            index.of.minima <- index.of.minima[-(i+1)]
+          }else{
+            df.Linienwerte$min[index.of.minima[i]] <- 0
+            index.of.minima <- index.of.minima[-i]
           }
+        }else{
+          i <- i + 1
+        }
+      }
+      
+      # Alle weitere Extrema untersuchen
+      while(i < length(index.of.maxima)){
+        
+        changed <- FALSE
+        # absteigender Ast
+        # Finde richtiges Maximum
+        dum.current.max <- df.Linienwerte$value[index.of.maxima[i-1]]
+        dum.current.min <- df.Linienwerte$value[index.of.minima[i]]
+        dum.current.fraction <- dum.current.max / dum.current.min
+        
+        # Wenn der Unterschied nicht gross genug ist, so loesche das
+        # Minimum und waehle das groesste Maximum
+        if(dum.current.fraction < par.hyaline){
+          
+          df.Linienwerte$min[index.of.minima[i]] <- 0
+          index.of.minima <- index.of.minima[-i]
+          
+          if(df.Linienwerte$value[index.of.maxima[i-1]] <
+             df.Linienwerte$value[index.of.maxima[i]]){
+            df.Linienwerte$max[index.of.maxima[i-1]] <- 0
+            index.of.maxima <- index.of.maxima[-(i-1)]
+          }else{
+            df.Linienwerte$max[index.of.maxima[i]] <- 0
+            index.of.maxima <- index.of.maxima[-i]
+          }
+          
+          changed <- TRUE
         }
         
-        if(i %% 2 == 0 && df.Linienwerte$min[index.of.maxima[i]] == 1){
-          # Finde richtiges Maximum
-          dum.current.max <- df.Linienwerte$value[index.of.maxima[i]]
-          dum.current.min <- df.Linienwerte$value[index.of.minima[i+1]]
-          dum.current.fraction <- dum.current.max / dum.current.min
+        # aufsteigender Ast
+        # Finde richtiges Minimum
+        dum.current.max <- df.Linienwerte$value[index.of.maxima[i]]
+        dum.current.min <- df.Linienwerte$value[index.of.minima[i]]
+        dum.current.fraction <- dum.current.max / dum.current.min
+        
+        # Wenn der Unterschied nicht gross genug ist, so loesche das Maximum
+        # und waehle das kleinste Minimum
+        if(dum.current.fraction < par.hyaline){
           
-          # Wenn der Unterschied nicht gross genug ist, so loesche das Maximum
-          # und waehle das kleinste Minimum
-          if(dum.current.fraction < par.hyaline){
-            
-            df.Linienwerte$max[index.of.maxima[i]] <- 0
-            
-            if(df.Linienwerte$value[index.of.minima[i]] <
-               df.Linienwerte$value[index.of.minima[i+1]]){
-              df.Linienwerte$min[index.of.minima[i+1]] <- 0
-            }else{
-              df.Linienwerte$min[index.of.minima[i]] <- 0
-            }
+          df.Linienwerte$max[index.of.maxima[i]] <- 0
+          index.of.maxima <- index.of.maxima[-i]
+          
+          if(df.Linienwerte$value[index.of.minima[i]] <
+             df.Linienwerte$value[index.of.minima[i+1]]){
+            df.Linienwerte$min[index.of.minima[i+1]] <- 0
+            index.of.minima <- index.of.minima[-(i+1)]
+          }else{
+            df.Linienwerte$min[index.of.minima[i]] <- 0
+            index.of.minima <- index.of.minima[-i]
           }
+          
+          changed <- TRUE
         }
+        
+        # Fange beim ursprünglichen i wieder an, falls ein Wert gelöscht
+        # wurde.
+        if(!changed){
+          i <- i + 1
+        }
+        
+          
       }
     }
   }else{
@@ -331,130 +447,8 @@ par.hyaline <- copy.par.hyaline
 df.Linienwerte$ring[current.range[current.range.ring]] <- 1
 
 
-### Bis hier ######
-
-
-
-index.range <- last.index.of.first.ring : 
-                  (last.index.of.first.ring + points.to.look.for.minimum)
-
-first.ring.minimum <-
-  which(df.Linienwerte$value ==
-          min(df.Linienwerte$value[index.range]))
-first.ring.minimum <- first.ring.minimum[
-  first.ring.minimum %in% index.range]
-
-
-
-index.range <- first.ring.minimum:nrow(df.Linienwerte)
-
-limit2 <-  par.hyaline * mean(df.Linienwerte$value[index.range])
-
-df.Linienwerte$ring[index.range] <-
-  ifelse(df.Linienwerte$value[index.range] > limit2, 1, 0)
-
-while(points.to.jump > 0){
-  pattern <- c(1, rep(0, points.to.jump), 1)
-  pattern <- paste(pattern, collapse = "")
-  
-  replacement <- c(1, rep(1, points.to.jump), 1)
-  replacement <- paste(replacement, collapse = "")
-  
-  hyaline.vector <- paste(df.Linienwerte$ring, collapse = "")
-  hyaline.vector <- gsub(pattern, replacement, hyaline.vector)
-  
-  df.Linienwerte$ring <-
-    as.numeric(unlist(strsplit(hyaline.vector, split = "")))
-  
-  points.to.jump <- points.to.jump - 1
-}
 
 # Zaehle Ringe
-ring <- 1
-if(df.Linienwerte$ring[1] != 0){
-  ring.change <- TRUE
-}else{
-  ring.change <- FALSE
-}
-
-
-for(i in 1:length(df.Linienwerte$ring)){
-  
-  if(df.Linienwerte$ring[i] == 0){
-    
-    if(ring.change == TRUE){
-      ring.change <- FALSE
-      ring <- ring + 1
-    }
-    
-  }else{
-    df.Linienwerte$ring[i] <- ring
-    
-    if(ring.change == FALSE){
-      ring.change <- TRUE
-    }
-  }
-}
-
-# Loesche alle hyaline Ringe, die keine richtigen Maxima sind
-number.of.rings <- max(df.Linienwerte$ring)
-for(i in 1:number.of.rings){
-  max.index <- which(df.Linienwerte$value == max(df.Linienwerte$value[df.Linienwerte$ring == i]))
-  last.index <- which(df.Linienwerte$ring == i)[length(which(df.Linienwerte$ring == i))]
-  
-  if(max.index == last.index){
-    df.Linienwerte$ring[df.Linienwerte$ring == i] <- 0
-  }
-}
-
-# Zaehle Ringe
-ring <- 1
-if(df.Linienwerte$ring[1] != 0){
-  ring.change <- TRUE
-}else{
-  ring.change <- FALSE
-}
-
-
-for(i in 1:length(df.Linienwerte$ring)){
-  
-  if(df.Linienwerte$ring[i] == 0){
-    
-    if(ring.change == TRUE){
-      ring.change <- FALSE
-      ring <- ring + 1
-    }
-    
-  }else{
-    df.Linienwerte$ring[i] <- ring
-    
-    if(ring.change == FALSE){
-      ring.change <- TRUE
-    }
-  }
-}
-
-# Loesche Ringe, die zu dicht beieinander sind. ####
-
-number.of.rings <- max(df.Linienwerte$ring)
-
-for(i in 1:(number.of.rings-1)){
-  last.point <- which(df.Linienwerte$ring == (i))[
-    length(which(df.Linienwerte$ring == (i)))]
-  first.point <- which(df.Linienwerte$ring == (i+1))[1]
-  ring.seperating.points <- first.point - last.point - 1
-  
-  if(ring.seperating.points < points.for.reconnecting){
-    if(all(df.Linienwerte$value[last.point:first.point] >
-           mean(df.Linienwerte$value))){
-      df.Linienwerte$ring[last.point:first.point] <- 1
-    }
-  }
-}
-
-
-# Zaehle erneut Ringe ####
-
 ring <- 1
 if(df.Linienwerte$ring[1] != 0){
   ring.change <- TRUE
