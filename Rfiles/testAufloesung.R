@@ -1,0 +1,1 @@
+# Einlesen der czi-Datei fuer den genauen Wert der Aufloesung
