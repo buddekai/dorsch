@@ -14,4 +14,3 @@ if(scale.x == scale.y){
 }else{
   print("Scales in x- and y-directions are not the same.")
 }
-
