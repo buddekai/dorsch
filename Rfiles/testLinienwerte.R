@@ -30,8 +30,8 @@ points.for.reconnecting <- 20
 # Starte Funktion hier ######
 
 # Lade die Linie mit dem Ergebnis: "Linienwerte"
-load("input/Bild4Linie2.RData")
-
+load("input/line.RDa")
+Linienwerte <- test
 Linienwerte <- Linienwerte[1:(length(Linienwerte)-remove.points)]
 Linienwerte.copy <- Linienwerte
 
